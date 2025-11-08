@@ -1,13 +1,18 @@
 # Printing under Linux
 
-## Contents
+## Information
 
 * [history](history.md)
 * [architecture](architecture.md)
 * [status](status.md)
 * [security](security.md)
 * [driverless](driverless.md)
+* [snap](snap.md)
 * [scanning](scanning.md) (WSD)
+
+## Problems
+
+* [Apt or Snap](apt-snap.md)
 
 ## Definitions
 

@@ -1,0 +1,72 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.5 Chrome/138.0.7204.251 Electron/37.6.1 Safari/537.36" version="28.2.5" pages="2">
+  <diagram name="cupsd" id="0">
+    <mxGraphModel dx="2176" dy="1089" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="none" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=none;fontColor=#333333;" parent="1" vertex="1">
+          <mxGeometry x="30" y="30" width="630" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="cups_scheduler" value="CUPS Scheduler (cupsd)" style="shape=ellipse;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="190" y="50" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="configuration" value="Configuration Files" style="shape=rectangle;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="50" y="150" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="job_processing" value="Job Processing Pipeline" style="shape=rectangle;fillColor=#cce5ff;strokeColor=#0073e6;" parent="1" vertex="1">
+          <mxGeometry x="190" y="150" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="filter_system" value="Filter System" style="shape=rectangle;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="365" y="150" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="backend_system" value="Backend System" style="shape=rectangle;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="515" y="150" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="relation1" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" parent="1" source="cups_scheduler" target="configuration" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="relation2" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" parent="1" source="cups_scheduler" target="job_processing" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="relation3" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" parent="1" source="job_processing" target="filter_system" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="relation4" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" parent="1" source="filter_system" target="backend_system" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="cups-browsed" id="1">
+    <mxGraphModel dx="706" dy="632" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=none;fontColor=#333333;" parent="1" vertex="1">
+          <mxGeometry x="30" y="30" width="490" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="cups_browsed" value="CUPS Browsed Daemon" style="shape=ellipse;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="190" y="50" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="local_queues" value="Local Queues" style="shape=rectangle;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="50" y="150" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="remote_queues" value="Remote Queues" style="shape=rectangle;fillColor=#cce5ff;strokeColor=#0073e6;" parent="1" vertex="1">
+          <mxGeometry x="190" y="150" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="discovery" value="Queue Discovery" style="shape=rectangle;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="365" y="150" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="relation1" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" parent="1" source="cups_browsed" target="local_queues" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="relation2" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" parent="1" source="cups_browsed" target="remote_queues" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="relation3" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#000000;" parent="1" source="remote_queues" target="discovery" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

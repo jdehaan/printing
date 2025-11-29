@@ -13,6 +13,7 @@
 ## Problems
 
 * [Apt or Snap](apt-snap.md)
+* [applications](applications.md)
 
 ## Definitions
 

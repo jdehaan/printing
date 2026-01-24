@@ -5,6 +5,8 @@ It is the **official way** and needs **zero .deb files**.
 
 Ubuntu uses snap for cups as an isolated setup to manage printers and the native debian package is to be considered obsolete.
 
+Reference: https://github.com/OpenPrinting/cups-snap
+
 ## Symptoms
 
 Common Signs of Mixed CUPS Setup:

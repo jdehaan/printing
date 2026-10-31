@@ -1,5 +1,14 @@
 # CUPS snap queue settings for the Canon MX925
 
+> **Warning: reboot persistence on this Ubuntu system.** Defaults set using
+> `snap run cups.lpadmin` or `snap run cups.lpoptions` did not remain effective
+> after reboot in the reported setup. Setting them in Ubuntu's printer settings
+> worked instead. Start with **Settings > Printers > Canon_MX925** and open
+> its printer properties/options (labels vary by Ubuntu version). Set paper
+> size to **A4**, media type to **Plain paper / Stationery**, and paper source
+> to **Bottom**, then apply the changes. Reopen Okular and verify after reboot.
+> Prefer regular A4, not A4 Borderless, for ordinary documents.
+
 This document explains why the Canon MX925 feeds paper from the top (rear)
 tray even when **Auto** or **Bottom** is selected, and how to configure the
 driverless CUPS snap queue so that plain A4 jobs use the bottom cassette.
@@ -99,7 +108,12 @@ Earlier notes suggested `InputSlot=Cassette`. This queue only accepts
 
 ### 1. Set A4 plain-paper defaults on the queue
 
-As root, set server-side defaults for all users:
+Use Ubuntu's printer settings first, as described in the warning above; this
+was the working approach on this system. The following commands are alternatives
+for configuring and diagnosing defaults, not a verified reboot-persistent
+solution here.
+
+As root, set server-side defaults for all users on the selected CUPS server:
 
 ```bash
 sudo snap run cups.lpadmin -p Canon_MX925 \
@@ -108,16 +122,53 @@ sudo snap run cups.lpadmin -p Canon_MX925 \
   -o InputSlot-default=Bottom
 ```
 
-Without root, set per-user defaults, which Okular and other Qt applications
-read:
+Without root, set defaults for the calling user's CUPS client. Applications
+using that client's defaults can read them, but applications may have their
+own saved settings or a different client configuration:
 
 ```bash
 snap run cups.lpoptions -p Canon_MX925 \
   -o PageSize=A4 -o MediaType=Stationery -o InputSlot=Bottom
 ```
 
-The queue is created by cups-browsed, so check after a reboot or printer
-rediscovery that the server-side defaults are still set.
+#### Why the command-line settings may not survive effectively
+
+CUPS snap does not inherently discard printer settings on reboot. Several
+layers can make a saved setting cease to be effective:
+
+- **Automatically managed queue:** `Canon_MX925` uses `implicitclass://` and
+  is created/updated by cups-browsed when the printer is rediscovered. This
+  regenerates its driverless PPD from printer capabilities. The live log shows
+  queue updates and says it restores defaults from the previous cups-browsed
+  session. That establishes a separate defaults-restoration path, but does not
+  prove it lost or overwrote the command-line changes.
+- **Server versus user defaults:** `lpadmin` changes server-side queue defaults;
+  `lpoptions` without root saves client defaults for its calling user. Snap
+  confinement and client configuration can affect which files and server are
+  used. Ubuntu's printer settings and an application's CUPS client must target
+  the same queue/server for their defaults to agree.
+- **Application overrides:** Okular's saved print settings and per-job options
+  can override queue defaults even when those defaults persisted correctly.
+
+Ubuntu's printer settings provide the working configuration path in this
+setup, but they still configure printing defaults rather than the printer's
+firmware. The precise reason they worked while the commands did not requires
+comparing the server, queue and defaults before and after reboot; it is not
+established by the symptom alone. Do not add a startup script to reapply the
+commands without first identifying which layer is replacing or overriding them.
+
+After applying the Ubuntu settings and again after reboot, inspect:
+
+```bash
+snap run cups.lpstat -v
+snap run cups.lpoptions -p Canon_MX925
+snap run cups.lpoptions -p Canon_MX925 -l
+```
+
+In the option list, `*` marks the selected default. Expect `*A4`,
+`*Stationery`, and `*Bottom`. Also check Okular's dialog and the submitted job
+as described under Verification; a correct option list alone does not prove
+that the application used those defaults.
 
 ### 2. Select A4 in the application
 

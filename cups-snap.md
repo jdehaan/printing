@@ -100,6 +100,157 @@ Revision **1200** is a downloadable amd64 snap using base `core22`. Revisions
 its page-count helper uses QPDF rather than the defective PDFio temporary-file
 implementation; it does not contain a backport of the missing-flush fix.
 
+### Expert mode: build and test a fixed snap
+
+This procedure builds the packaging checkout with the libcupsfilters fix pinned
+to commit `e7356ce13c96f0e29402d9b03f615eab24c68cc0`. The existing local checkout
+already has this `source-commit` in `snapcraft.yaml`; do not clone over it or
+replace it with a floating `master` branch. The build log shows Snapcraft using
+its managed LXD provider and stopping before compilation because the login did
+not have LXD permissions.
+
+**Security:** members of the `lxd` group can effectively obtain root access to
+the host. Only grant this to a trusted account, and remove the membership after
+building if it is not otherwise needed.
+
+From the account that will build the snap, grant LXD access:
+
+```bash
+sudo usermod -aG lxd "$USER"
+```
+
+Log out of the desktop and all terminal sessions for that account, then log
+back in. A new login session is required for the supplementary group to take
+effect. Verify the group before running Snapcraft:
+
+```bash
+id -nG
+lxc list
+```
+
+The first command should include `lxd`; `lxc list` should connect without a
+permissions error. If Snapcraft is not installed yet:
+
+```bash
+sudo snap install snapcraft --classic
+```
+
+Build from the existing packaging checkout. Substitute its path if it is not
+under the printing notes directory:
+
+```bash
+cd /path/to/printing/cups-snap
+git diff -- snapcraft.yaml
+snapcraft clean libcupsfilters libppd cups-filters cups-browsed scripts cups-proxyd
+snapcraft
+ls -lh ./*.snap
+```
+
+Check that the diff pins `libcupsfilters` to the intended commit and that
+Snapcraft completes successfully. Cleaning these parts removes cached build
+outputs for the changed library and downstream parts, so Snapcraft rebuilds them.
+The build may take a while and needs network access and disk space. Keep the
+resulting amd64 snap filename for the next steps. If desired, remove LXD access
+now, then log out and back in again:
+
+```bash
+sudo gpasswd -d "$USER" lxd
+```
+
+Installing a locally built snap replaces the installed `cups` snap only after
+the existing snap is removed, so expect a short printing outage. First save
+Snap-managed data and note the snapshot ID:
+
+```bash
+sudo snap save cups
+snap saved
+```
+
+Stop or cancel active print jobs. From the build directory, set `SNAP_FILE` to
+the exact artifact produced above, then remove the installed snap and install
+the local package. Do not use a wildcard if more than one artifact is present.
+
+```bash
+SNAP_FILE='./cups_2.4.20-2_amd64.snap'
+sudo snap remove cups
+sudo snap install --dangerous "$SNAP_FILE"
+snap list cups
+```
+
+`--dangerous` permits installation of the locally built, unsigned snap; it does
+not disable confinement. Snap normally preserves data on removal. Check that
+the printer queues and settings returned; if not, restore the snapshot using
+the ID shown by `snap saved` (`sudo snap restore SNAPSHOT_ID cups`).
+
+Before resuming real jobs, rerun the bundled-PDF filter test **without** the
+streaming workaround. It must exit successfully and must not report `Missing
+Root object` or `Unexpected page count`:
+
+```bash
+PRINTER='your-printer-queue'
+sudo snap run cups.cupsfilter \
+   -p "/var/snap/cups/common/etc/cups/ppd/${PRINTER}.ppd" \
+   -m image/urf \
+   /snap/cups/current/share/cups/data/default-testpage.pdf \
+   > /dev/null
+```
+
+Then enable the queue and send a simple test print. If the test fails or the
+snap does not start, use the Store return procedure below.
+
+#### Return to the Snap Store channel
+
+First try an in-place refresh to the upstream stable channel. `--amend` allows
+Snap to attempt refreshing a locally installed snap that is unknown to the Store:
+
+```bash
+sudo snap refresh cups --channel=latest/stable --amend
+snap list cups
+```
+
+If the refresh succeeds, verify that Tracking reports `latest/stable`, check
+that CUPS is running and the printer queues remain available, then remove the
+local `.snap` file as described below. If Snap reports that it cannot refresh
+the sideloaded package, use the remove-and-reinstall fallback.
+
+Before removing the locally installed build, save its data and note the
+snapshot ID:
+
+```bash
+sudo snap save cups
+snap saved
+```
+
+Remove the sideloaded snap, then install the Store release on the stable channel.
+This gives the installation stable-channel tracking again.
+
+```bash
+sudo snap remove cups
+sudo snap install cups --channel=latest/stable
+snap list cups
+```
+
+Check that `snap list cups` reports `latest/stable` under Tracking. Check that
+the printer queues and settings are present; if they are missing, restore the
+snapshot using the ID from `snap saved`:
+
+```bash
+sudo snap restore SNAPSHOT_ID cups
+```
+
+Once the Store snap is running and its data is verified, remove the local
+package file if you no longer need it. Replace the example with the exact path
+you used for `SNAP_FILE`:
+
+```bash
+rm -- ./cups_2.4.20-2_amd64.snap
+```
+
+As of the investigation date, stable revision 1277 has the known bug, so this
+return restores the upstream package but also restores the original failure.
+The local build has not been tested here; treat the filter test and physical
+test print as required validation before relying on it.
+
 Downloads were obtained with `snap download cups --revision=REVISION` and
 inspected using `unsquashfs` and `objdump`. Each downloaded snap's
 `meta/snap.yaml` confirmed its version and amd64 architecture. A controlled test

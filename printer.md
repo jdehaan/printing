@@ -16,7 +16,7 @@ PRINTER_IP='your-printer-address'
 ## issues
 
 - sometimes looses connectivity to the WLAN
-- printing from firefox leads to the printer to try to take paper from the top loader instead of the bottom. Printing via the default pdf reader works
+- printing leads to the printer taking paper from the top loader instead of the bottom, see [cups-snap-settings.md](cups-snap-settings.md)
 - same issues with the scanner regarding connectivity
 
 ## tried out
@@ -59,23 +59,13 @@ ping -c 10 "$PRINTER_IP"
 - **Set static IP** on both router AND printer to avoid DHCP conflicts
 - **Update printer firmware** via Canon's website
 
-### 2. **Firefox Paper Tray Selection Issue**
+### 2. **Paper Tray Selection Issue**
 
-**Root Cause:**
-
-- **Print Dialog Settings**: Firefox may not be passing correct tray preferences to CUPS
-- **CUPS Driver Configuration**: Driverless mode might not properly communicate tray preferences
-- **Default Paper Source Mapping**: Firefox's print subsystem differs from PDF readers
-
-**Solutions:**
-
-Inspect the queue's supported paper sources and select the intended tray using
-the [CUPS snap queue tools](cups-snap.md#queue-tools-and-paper-source).
-
-**Firefox-Specific Fix:**
-
-1. In Firefox: `about:config` -> set `print.cups.monochrome.extra_settings` to `InputSlot=Cassette`
-2. Or print via "Save as PDF" then use your PDF reader
+The printer feeds from the top tray whatever the selected source, because the
+printer's own defaults are 4x6 inch photo paper. Applications then send a
+custom size the printer rejects, and photo or small media can only use the top
+tray. The analysis, queue settings, and verification steps are in
+[cups-snap-settings.md](cups-snap-settings.md).
 
 ### 3. **Scanner Connectivity Issues**
 

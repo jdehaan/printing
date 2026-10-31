@@ -1,7 +1,8 @@
 # CUPS Snap
 
-Snap-specific troubleshooting and dependency provenance. Printer hardware,
-network connectivity, and paper-tray notes are in [printer.md](printer.md).
+Snap-specific troubleshooting and dependency provenance. Printer hardware
+and network connectivity notes are in [printer.md](printer.md); queue defaults
+and paper-tray selection are in [cups-snap-settings.md](cups-snap-settings.md).
 No apt CUPS installation is required for the procedures below.
 
 ## Source and build integration
@@ -176,6 +177,7 @@ sudo snap remove cups
 sudo snap install --dangerous "$SNAP_FILE"
 snap list cups
 ```
+
 
 `--dangerous` permits installation of the locally built, unsigned snap; it does
 not disable confinement. Snap normally preserves data on removal. Check that
@@ -454,4 +456,4 @@ snap run cups.lpoptions -p "$PRINTER" -o InputSlot=Bottom
 
 `Bottom`, `Cassette`, and `MediaSource` are not interchangeable universal
 settings. An application can override queue defaults for an individual job.
-Printer-specific symptoms and Firefox notes remain in [printer.md](printer.md).
+The MX925 paper-tray analysis is in [cups-snap-settings.md](cups-snap-settings.md).

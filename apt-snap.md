@@ -15,6 +15,7 @@ Common Signs of Mixed CUPS Setup:
 2. **Service instability** - Conflicting services competing for resources
 3. **Path conflicts** - ppd paths may be accessed by wrong CUPS version
 4. **Port conflicts** - Both trying to bind to port 631
+5. **Printer missing in applications** - The Snap's CUPS may have no printer queue or may not be allowed to discover the printer
 
 ## Check
 
@@ -113,3 +114,35 @@ sudo snap set cups sharing enabled=true
 # Update CUPS (auto, but you can force)
 sudo snap refresh cups
 ```
+
+### Printer missing in applications
+
+A locally built Snap installed with `--dangerous` may not have the interfaces
+that allow it to discover printers connected to the network or USB.
+
+```bash
+# Check whether printer discovery interfaces are connected
+snap connections cups
+
+# Check whether CUPS has any printer queues
+cups.lpstat -e
+cups.lpstat -v
+```
+
+For network printers, connect Avahi and network monitoring, then restart CUPS:
+
+```bash
+sudo snap connect cups:avahi-control
+sudo snap connect cups:network-manager-observe
+sudo snap restart cups
+```
+
+For a USB printer, also connect raw USB access:
+
+```bash
+sudo snap connect cups:raw-usb
+```
+
+Check `cups.lpstat -e` again. If it still lists no printers, add the printer
+to the Snap's CUPS; connecting interfaces enables discovery but does not create
+a queue for a printer that was not discovered.

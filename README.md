@@ -8,6 +8,7 @@
 * [security](security.md)
 * [driverless](driverless.md)
 * [snap](snap.md)
+* [CUPS snap troubleshooting and build provenance](cups-snap.md)
 * [scanning](scanning.md) (WSD)
 
 ## Problems
